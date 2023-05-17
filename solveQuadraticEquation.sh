@@ -14,11 +14,15 @@ remove_trailing_decimal_point () {
 }
 
 remove_surplus_zero () {
-  if [ ${1: -1} -eq 0 ]; then
+  if [[ ${1: -1} -eq 0 && $(echo -n $1 | wc -m) -gt 1 ]]; then
     echo ${1::-1}
   else
     echo $1
   fi
+}
+
+format_number () {
+  echo $(remove_surplus_zero "$(remove_trailing_decimal_point $1)")
 }
 
 echo -e "\nLemme solve your quadratic equation amigo\nInput $(format_text_with_underline a 11), $(format_text_with_underline b 11), and $(format_text_with_underline c 11)\n"
@@ -64,15 +68,44 @@ for i in ${sorted_parameters[@]}; do
   done
 done
 
+# edge case analysis
+
+# check if all parameters are zero then stop script execution
+if [[ $(format_number ${parameters[a]}) -eq 0 && $(format_number ${parameters[b]}) -eq 0 && $(format_number ${parameters[c]}) -eq 0 ]]; then
+  echo -e "\n$(format_text "All real numbers are solutions." 11)\n"
+  exit
+fi
+
+# check if a and b are zero but c isn't zero then stop script execution 
+if [[ $(format_number ${parameters[a]}) -eq 0 && $(format_number ${parameters[b]}) -eq 0 && $(format_number ${parameters[c]}) -ne 0 ]]; then
+  echo -e "\n$(format_text "There are no solutions." 11)\n"
+  exit
+fi
+
+# check if a and c are zero but b isn't zero then stop script execution 
+if [[ $(format_number ${parameters[a]}) -eq 0 && $(format_number ${parameters[b]}) -ne 0 && $(format_number ${parameters[c]}) -eq 0 ]]; then
+  echo -e "\n$(format_text x 11) = $(format_text 0 11)\n"
+  exit
+fi
+
+# check if a is zero but b and c aren't zero then stop script execution 
+if [[ $(format_number ${parameters[a]}) -eq 0 && $(format_number ${parameters[b]}) -ne 0 && $(format_number ${parameters[c]}) -ne 0 ]]; then
+  x=$( bc <<< "scale=2; -1 * ${parameters[c]} / ${parameters[b]}" )
+
+  echo -e "\n$(format_text x 11) = $(format_text $(format_number $x) 11)\n"
+
+  exit
+fi
+
 discriminant=$( bc <<< "scale=2; (${parameters[b]} ^ 2) - 4 * ${parameters[a]} * ${parameters[c]}" )
 
 if [ $( bc <<< "scale=2; $discriminant > 0" ) -eq 1 ]; then
   echo -e "\nResults:"
 
-  x1=$( bc <<< "scale=2; (-${parameters[b]} + sqrt($discriminant)) / (2 * ${parameters[a]})" )
-  x2=$( bc <<< "scale=2; (-${parameters[b]} - sqrt($discriminant)) / (2 * ${parameters[a]})" )
+  x1=$( bc <<< "scale=2; (-1 * ${parameters[b]} + sqrt($discriminant)) / (2 * ${parameters[a]})" )
+  x2=$( bc <<< "scale=2; (-1 * ${parameters[b]} - sqrt($discriminant)) / (2 * ${parameters[a]})" )
 
-  echo -e "\n$(format_text x1 11) = $(format_text $(remove_surplus_zero "$(remove_trailing_decimal_point $x1)") 11)\n$(format_text x2 11) = $(format_text $(remove_surplus_zero "$(remove_trailing_decimal_point $x2)") 11)\n"
+  echo -e "\n$(format_text x1 11) = $(format_text $(format_number $x1) 11)\n$(format_text x2 11) = $(format_text $(format_number $x2) 11)\n"
 
   exit
 elif [ $( bc <<< "scale=2; $discriminant < 0" ) -eq 1 ]; then
@@ -80,9 +113,9 @@ elif [ $( bc <<< "scale=2; $discriminant < 0" ) -eq 1 ]; then
 
   exit 
 elif [ $( bc <<< "scale=2; $discriminant == 0" ) -eq 1 ]; then 
-  x=$( bc <<< "scale=2; -${parameters[b]} / (2 * ${parameters[a]})" )
+  x=$( bc <<< "scale=2; -1 * ${parameters[b]} / (2 * ${parameters[a]})" )
 
-  echo -e "\n$(format_text x 11) = $(format_text $(remove_surplus_zero "$(remove_trailing_decimal_point $x)") 11)\n"
+  echo -e "\n$(format_text x 11) = $(format_text $(format_number $x) 11)\n"
 
   exit
 fi
