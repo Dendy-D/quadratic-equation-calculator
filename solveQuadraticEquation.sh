@@ -42,8 +42,8 @@ declare -A parameters=(
 )
  
 rebukes=(
-  "Sorry dude, but you have to input an $(format_text_with_underline number 1)"
-  "Brodie listen to me.. number.., you have to type an $(format_text_with_underline number 1)"
+  "Sorry dude, but you have to input a $(format_text_with_underline number 1)"
+  "Brodie listen to me.. number.., you have to type a $(format_text_with_underline number 1)"
   "Nah brah, look a' me and try to get the point. You need to put here a dammit $(format_text_with_underline number 1)"
   "Jesus Christ man, are you kidding me? Don't make me spell it out again: $(format_text_with_underline number 1)"
 )
