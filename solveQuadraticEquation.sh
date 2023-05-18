@@ -109,7 +109,7 @@ if [ $( bc <<< "scale=2; $discriminant > 0" ) -eq 1 ]; then
 
   exit
 elif [ $( bc <<< "scale=2; $discriminant < 0" ) -eq 1 ]; then
-  echo -e "\n$(tput setaf 11)$(tput bold)Unfortunately your discriminant is less than 0. $(tput setaf 16)$(tput setab 11)The equation is unsolvable$(tput sgr0)\n"
+  echo -e "\n$(tput setaf 11)$(tput bold)Unfortunately the discriminant is less than 0. $(tput setaf 16)$(tput setab 11)The equation is unsolvable$(tput sgr0)\n"
 
   exit 
 elif [ $( bc <<< "scale=2; $discriminant == 0" ) -eq 1 ]; then 
